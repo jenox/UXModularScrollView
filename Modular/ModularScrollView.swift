@@ -32,35 +32,37 @@ class ModularScrollView<Module: UIView>: UIScrollView {
 
     private(set) public var modules: [Module] = []
 
+    // -> vertical layout constraints
     private var verticalSpacingConstraints: [NSLayoutConstraint] = []
 
 
 
     public func insertModule(_ module: Module, at index: Int) {
-        self.contentView.addSubview(module)
+        precondition(0 <= index && index <= self.modules.count)
+        precondition(!self.modules.contains(module))
+
+        self.addSubview(module)
 
         module.translatesAutoresizingMaskIntoConstraints = false
         module.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
         module.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
 
         // Kill constraint connecting modules at indices `index - 1` and `index`
-        if !self.modules.isEmpty {
-            self.verticalSpacingConstraints[index].isActive = false
-            self.verticalSpacingConstraints.remove(at: index)
-        }
+        self.verticalSpacingConstraints[index].isActive = false
+        self.verticalSpacingConstraints.remove(at: index)
 
         let top: NSLayoutConstraint
         let bottom: NSLayoutConstraint
 
-        if index > 0 {
-            top = module.topAnchor.constraint(equalTo: modules[index - 1].bottomAnchor, constant: self.moduleSpacing)
+        if let previousModule = self.modules.prefix(index).last {
+            top = module.topAnchor.constraint(equalTo: previousModule.bottomAnchor, constant: self.moduleSpacing)
         }
         else {
             top = module.topAnchor.constraint(equalTo: self.contentView.topAnchor)
         }
 
-        if index < self.modules.count {
-            bottom = self.modules[index].topAnchor.constraint(equalTo: module.bottomAnchor, constant: self.moduleSpacing)
+        if let nextModule = self.modules.dropFirst(index).first {
+            bottom = nextModule.topAnchor.constraint(equalTo: module.bottomAnchor, constant: self.moduleSpacing)
         }
         else {
             bottom = self.contentView.bottomAnchor.constraint(equalTo: module.bottomAnchor)
@@ -111,6 +113,11 @@ class ModularScrollView<Module: UIView>: UIScrollView {
         self.contentView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         self.contentView.widthAnchor.constraint(equalTo: self.widthAnchor).isActive = true
 
+        let constraint = self.contentView.topAnchor.constraint(equalTo: self.contentView.bottomAnchor)
+        constraint.isActive = true
+
+        self.verticalSpacingConstraints = [constraint]
+
 //        print(self.readableContentGuide.constraintsAffectingLayout(for: .horizontal))
 //        let c = self.readableContentGuide.widthAnchor.constraint(lessThanOrEqualToConstant: 500)
 //        c.priority = UILayoutPriority(1000)
@@ -118,19 +125,29 @@ class ModularScrollView<Module: UIView>: UIScrollView {
 //        print(self.readableContentGuide.constraintsAffectingLayout(for: .horizontal))
     }
 
-
-
-
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
 
         for module in self.modules {
-            if module.hasAmbiguousLayout {
-                print("MODULE \(module) HAS AMBIGUOUS LAYOUT")
-            }
+            self.ensureIntegrity(of: module)
         }
 
-//        print(self.readableContentGuide)
-        print(self.readableContentGuide.layoutFrame)
+        self.ensureIntegrity(of: self)
+    }
+
+    // observe subviews, so that if one is removed, we update constraints? (they get deactivated anyway but we'd keep reference)
+    public override func willRemoveSubview(_ subview: UIView) {
+        super.willRemoveSubview(subview)
+
+//        if let module = subview as? Module, let index = self.modules.firstIndex(of: module) {
+//            self.removeModule(at: index)
+//        }
+    }
+
+
+    fileprivate func ensureIntegrity(of module: UIView) {
+        if module.hasAmbiguousLayout {
+            print("MODULE \(module) HAS AMBIGUOUS LAYOUT")
+        }
     }
 }

@@ -38,7 +38,18 @@ class ViewController: UIViewController {
         self.scrollView.appendModule(label1)
         self.scrollView.appendModule(label2)
         self.scrollView.insertModule(label3, at: 1)
+
+        let marker = UIView()
+        marker.backgroundColor = UIColor.black.withAlphaComponent(0.1)
+        self.view.addSubview(marker)
+        marker.translatesAutoresizingMaskIntoConstraints = false
+        marker.topAnchor.constraint(equalTo: self.view.readableContentGuide.topAnchor).isActive = true
+        marker.leadingAnchor.constraint(equalTo: self.view.readableContentGuide.leadingAnchor).isActive = true
+        marker.trailingAnchor.constraint(equalTo: self.view.readableContentGuide.trailingAnchor).isActive = true
+        marker.bottomAnchor.constraint(equalTo: self.view.readableContentGuide.bottomAnchor).isActive = true
     }
+
+
 }
 
 class WrappedLabel: UIView {
@@ -53,7 +64,9 @@ class WrappedLabel: UIView {
         self.addSubview(self.marker)
 
         self.label.font = UIFont.systemFont(ofSize: 30.0, weight: .regular)
+//        self.label.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: UIFont.systemFont(ofSize: 20, weight: .regular))
         self.label.numberOfLines = 0
+        self.label.adjustsFontForContentSizeCategory = true
 
         self.label.translatesAutoresizingMaskIntoConstraints = false
         self.label.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
