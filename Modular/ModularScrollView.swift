@@ -28,6 +28,33 @@ class ModularScrollView<Module: UIView>: UIScrollView {
 
     // MARK: - Module Management
 
+    // TODO: header, footer view
+
+    fileprivate var paddingAtTopEdgeConstraint: NSLayoutConstraint! = nil
+    fileprivate var paddingAtLeadingEdgeConstraint: NSLayoutConstraint! = nil
+    fileprivate var paddingAtTrailingEdgeConstraint: NSLayoutConstraint! = nil
+    fileprivate var paddingAtBottomEdgeConstraint: NSLayoutConstraint! = nil
+
+//    let top = self.paddingAtTopEdgeConstraint.constant
+//    let left = self.paddingAtLeadingEdgeConstraint.constant
+//    let right = self.paddingAtTrailingEdgeConstraint.constant
+//    let bottom = self.paddingAtBottomEdgeConstraint.constant
+//
+//    return UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
+
+    public var padding: UIEdgeInsets = .zero {
+        didSet {
+            self.paddingAtTopEdgeConstraint.constant = fmax(self.padding.top, 0)
+            self.paddingAtLeadingEdgeConstraint.constant = fmax(self.padding.left, 0)
+            self.paddingAtTrailingEdgeConstraint.constant = fmax(self.padding.right, 0)
+            self.paddingAtBottomEdgeConstraint.constant = fmax(self.padding.bottom, 0)
+        }
+    }
+
+    public var maximumModuleWidth: CGFloat? = nil {
+        didSet {}
+    }
+
     private let moduleSpacing: CGFloat = 10
 
     private(set) public var modules: [Module] = []
@@ -41,11 +68,11 @@ class ModularScrollView<Module: UIView>: UIScrollView {
         precondition(0 <= index && index <= self.modules.count)
         precondition(!self.modules.contains(module))
 
-        self.addSubview(module)
+        self.contentView.addSubview(module)
 
         module.translatesAutoresizingMaskIntoConstraints = false
-        module.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
-        module.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
+        module.leadingAnchor.constraint(equalTo: self.moduleLayoutGuide.leadingAnchor).isActive = true
+        module.trailingAnchor.constraint(equalTo: self.moduleLayoutGuide.trailingAnchor).isActive = true
 
         // Kill constraint connecting modules at indices `index - 1` and `index`
         self.verticalSpacingConstraints[index].isActive = false
@@ -58,14 +85,14 @@ class ModularScrollView<Module: UIView>: UIScrollView {
             top = module.topAnchor.constraint(equalTo: previousModule.bottomAnchor, constant: self.moduleSpacing)
         }
         else {
-            top = module.topAnchor.constraint(equalTo: self.contentView.topAnchor)
+            top = module.topAnchor.constraint(equalTo: self.moduleLayoutGuide.topAnchor)
         }
 
         if let nextModule = self.modules.dropFirst(index).first {
             bottom = nextModule.topAnchor.constraint(equalTo: module.bottomAnchor, constant: self.moduleSpacing)
         }
         else {
-            bottom = self.contentView.bottomAnchor.constraint(equalTo: module.bottomAnchor)
+            bottom = self.moduleLayoutGuide.bottomAnchor.constraint(equalTo: module.bottomAnchor)
         }
 
         NSLayoutConstraint.activate([
@@ -98,11 +125,12 @@ class ModularScrollView<Module: UIView>: UIScrollView {
 
     // MARK: - Subview Management
 
-    // replace with layout guide?
-    fileprivate  let contentView: UIView = UIView()
+    public let contentView: UIView = UIView()
+    public let moduleLayoutGuide: UILayoutGuide = UILayoutGuide()
 
     fileprivate func establishSubviewHiearchy() {
         self.addSubview(self.contentView)
+        self.addLayoutGuide(self.moduleLayoutGuide)
     }
 
     fileprivate func configureLayoutConstraints() {
@@ -112,17 +140,21 @@ class ModularScrollView<Module: UIView>: UIScrollView {
         self.contentView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
         self.contentView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         self.contentView.widthAnchor.constraint(equalTo: self.widthAnchor).isActive = true
+        self.contentView.backgroundColor = UIColor.yellow
+
+        NSLayoutConstraint.activate([
+            self.moduleLayoutGuide.topAnchor.constraint(equalTo: self.contentView.topAnchor).save(to: &self.paddingAtTopEdgeConstraint),
+            self.moduleLayoutGuide.leadingAnchor.constraint(greaterThanOrEqualTo: self.contentView.leadingAnchor).save(to: &self.paddingAtLeadingEdgeConstraint),
+            self.contentView.trailingAnchor.constraint(greaterThanOrEqualTo: self.moduleLayoutGuide.trailingAnchor).save(to: &self.paddingAtTrailingEdgeConstraint),
+            self.contentView.bottomAnchor.constraint(equalTo: self.moduleLayoutGuide.bottomAnchor).save(to: &self.paddingAtBottomEdgeConstraint),
+            self.moduleLayoutGuide.widthAnchor.constraint(equalTo: self.contentView.widthAnchor).priority(.defaultHigh),
+            self.moduleLayoutGuide.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor).priority(.defaultHigh),
+        ])
 
         let constraint = self.contentView.topAnchor.constraint(equalTo: self.contentView.bottomAnchor)
         constraint.isActive = true
 
         self.verticalSpacingConstraints = [constraint]
-
-//        print(self.readableContentGuide.constraintsAffectingLayout(for: .horizontal))
-//        let c = self.readableContentGuide.widthAnchor.constraint(lessThanOrEqualToConstant: 500)
-//        c.priority = UILayoutPriority(1000)
-//        c.isActive = true
-//        print(self.readableContentGuide.constraintsAffectingLayout(for: .horizontal))
     }
 
     public override func layoutSubviews() {
@@ -149,5 +181,20 @@ class ModularScrollView<Module: UIView>: UIScrollView {
         if module.hasAmbiguousLayout {
             print("MODULE \(module) HAS AMBIGUOUS LAYOUT")
         }
+    }
+}
+
+extension NSLayoutConstraint {
+
+    @discardableResult
+    func priority(_ priority: UILayoutPriority) -> NSLayoutConstraint {
+        self.priority = priority
+        return self
+    }
+
+    @discardableResult
+    func save(to constraint: inout NSLayoutConstraint!) -> NSLayoutConstraint {
+        constraint = self
+        return self
     }
 }

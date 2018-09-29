@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIScrollViewDelegate {
 
     override func loadView() {
         self.view = ModularScrollView(frame: UIScreen.main.bounds)
@@ -18,10 +18,16 @@ class ViewController: UIViewController {
         return self.view as! ModularScrollView
     }
 
+    let headerView = UIView()
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.scrollView.delegate = self
         self.view.backgroundColor = .white
+
+        self.headerView.backgroundColor = .red
+        self.scrollView.addSubview(self.headerView)
 
         let label1 = WrappedLabel()
         label1.backgroundColor = UIColor.red.withAlphaComponent(0.2)
@@ -39,17 +45,15 @@ class ViewController: UIViewController {
         self.scrollView.appendModule(label2)
         self.scrollView.insertModule(label3, at: 1)
 
-        let marker = UIView()
-        marker.backgroundColor = UIColor.black.withAlphaComponent(0.1)
-        self.view.addSubview(marker)
-        marker.translatesAutoresizingMaskIntoConstraints = false
-        marker.topAnchor.constraint(equalTo: self.view.readableContentGuide.topAnchor).isActive = true
-        marker.leadingAnchor.constraint(equalTo: self.view.readableContentGuide.leadingAnchor).isActive = true
-        marker.trailingAnchor.constraint(equalTo: self.view.readableContentGuide.trailingAnchor).isActive = true
-        marker.bottomAnchor.constraint(equalTo: self.view.readableContentGuide.bottomAnchor).isActive = true
+        self.scrollView.padding = UIEdgeInsets(top: 110, left: 10, bottom: 10, right: 10)
+        self.scrollView.moduleLayoutGuide.widthAnchor.constraint(lessThanOrEqualToConstant: 500).isActive = true
     }
 
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let dy = scrollView.contentOffset.y + scrollView.adjustedContentInset.top
 
+        self.headerView.frame = CGRect(x: 2, y: 2 + dy, width: self.view.bounds.width - 4, height: fmax(96 - dy, 0))
+    }
 }
 
 class WrappedLabel: UIView {
@@ -63,7 +67,7 @@ class WrappedLabel: UIView {
         self.addSubview(self.label)
         self.addSubview(self.marker)
 
-        self.label.font = UIFont.systemFont(ofSize: 30.0, weight: .regular)
+        self.label.font = UIFont.systemFont(ofSize: 25.0, weight: .regular)
 //        self.label.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: UIFont.systemFont(ofSize: 20, weight: .regular))
         self.label.numberOfLines = 0
         self.label.adjustsFontForContentSizeCategory = true
@@ -92,10 +96,4 @@ class WrappedLabel: UIView {
         get { return self.label.text }
         set { self.label.text = newValue }
     }
-
-    override var backgroundColor: UIColor? {
-        get { return self.label.backgroundColor }
-        set { self.label.backgroundColor = newValue }
-    }
 }
-
