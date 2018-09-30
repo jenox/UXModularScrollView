@@ -1,6 +1,8 @@
 /*
  MIT License
+
  Copyright (c) 2018 Christian Schnorr
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -9,6 +11,7 @@
  furnished to do so, subject to the following conditions:
  The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +24,7 @@
 import UIKit
 
 
-public class ModularScrollView<Module: UIView>: UIScrollView {
+public class UXModularScrollView<Module: UIView>: UIScrollView {
 
     // MARK: - Initialization
 
@@ -39,15 +42,21 @@ public class ModularScrollView<Module: UIView>: UIScrollView {
     }
 
 
-
     // MARK: - Configuration
 
     public let contentView: UIView = UIView()
 
     public let moduleLayoutGuide: UILayoutGuide = UILayoutGuide()
 
-    public var padding: UIEdgeInsets = .zero {
-        didSet { self.updatePaddingConstraints() }
+    public var moduleInsets: UIEdgeInsets {
+        get { return self.contentView.layoutMargins }
+        set { self.contentView.layoutMargins = newValue }
+    }
+
+    @available(iOS 11.0, *)
+    public var directionalModuleInsets: NSDirectionalEdgeInsets {
+        get { return self.contentView.directionalLayoutMargins }
+        set { self.contentView.directionalLayoutMargins = newValue }
     }
 
     public var verticalModuleSpacing: CGFloat = 0 {
@@ -154,14 +163,11 @@ public class ModularScrollView<Module: UIView>: UIScrollView {
 
     // MARK: - Sizing & Layout
 
-    private var paddingAtTopEdgeConstraint: NSLayoutConstraint! = nil
-    private var paddingAtLeadingEdgeConstraint: NSLayoutConstraint! = nil
-    private var paddingAtTrailingEdgeConstraint: NSLayoutConstraint! = nil
-    private var paddingAtBottomEdgeConstraint: NSLayoutConstraint! = nil
-
     fileprivate func establishSubviewHiearchy() {
         self.addSubview(self.contentView)
         self.addLayoutGuide(self.moduleLayoutGuide)
+
+        self.contentView.layoutMargins = .zero
     }
 
     fileprivate func createLayoutConstraints() {
@@ -184,48 +190,19 @@ public class ModularScrollView<Module: UIView>: UIScrollView {
     }
 
     private func createModuleLayoutGuideConstraints() {
-        self.paddingAtTopEdgeConstraint = self.moduleLayoutGuide.topAnchor.constraint(equalTo: self.contentView.topAnchor)
-        self.paddingAtLeadingEdgeConstraint = self.moduleLayoutGuide.leadingAnchor.constraint(greaterThanOrEqualTo: self.contentView.leadingAnchor)
-        self.paddingAtTrailingEdgeConstraint = self.contentView.trailingAnchor.constraint(greaterThanOrEqualTo: self.moduleLayoutGuide.trailingAnchor)
-        self.paddingAtBottomEdgeConstraint = self.contentView.bottomAnchor.constraint(equalTo: self.moduleLayoutGuide.bottomAnchor)
-
-        let moduleWidthConstraint = self.moduleLayoutGuide.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor)
+        let moduleWidthConstraint = self.moduleLayoutGuide.widthAnchor.constraint(equalTo: self.contentView.widthAnchor)
         moduleWidthConstraint.priority = .defaultHigh
 
         let moduleCenterConstraint = self.moduleLayoutGuide.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor)
         moduleCenterConstraint.priority = .defaultHigh
 
         NSLayoutConstraint.activate([
-            self.paddingAtTopEdgeConstraint,
-            self.paddingAtLeadingEdgeConstraint,
-            self.paddingAtTrailingEdgeConstraint,
-            self.paddingAtBottomEdgeConstraint,
+            self.moduleLayoutGuide.topAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.topAnchor),
+            self.moduleLayoutGuide.leadingAnchor.constraint(greaterThanOrEqualTo: self.contentView.layoutMarginsGuide.leadingAnchor),
+            self.contentView.layoutMarginsGuide.trailingAnchor.constraint(greaterThanOrEqualTo: self.moduleLayoutGuide.trailingAnchor),
+            self.contentView.layoutMarginsGuide.bottomAnchor.constraint(equalTo: self.moduleLayoutGuide.bottomAnchor),
             moduleWidthConstraint,
             moduleCenterConstraint,
         ])
-    }
-
-    fileprivate func updatePaddingConstraints() {
-        self.paddingAtTopEdgeConstraint.constant = fmax(self.padding.top, 0)
-        self.paddingAtLeadingEdgeConstraint.constant = fmax(self.padding.left, 0)
-        self.paddingAtTrailingEdgeConstraint.constant = fmax(self.padding.right, 0)
-        self.paddingAtBottomEdgeConstraint.constant = fmax(self.padding.bottom, 0)
-    }
-
-
-    // MARK: - Debug
-
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-
-        for module in self.modules {
-            self.ensureIntegrity(of: module)
-        }
-
-        self.ensureIntegrity(of: self)
-    }
-
-    fileprivate func ensureIntegrity(of module: UIView) {
-        _ = module.hasAmbiguousLayout
     }
 }

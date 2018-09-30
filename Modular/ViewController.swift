@@ -11,11 +11,11 @@ import UIKit
 class ViewController: UIViewController, UIScrollViewDelegate {
 
     override func loadView() {
-        self.view = ModularScrollView(frame: UIScreen.main.bounds)
+        self.view = DebugModularScrollView(frame: UIScreen.main.bounds)
     }
 
-    var scrollView: ModularScrollView<UIView> {
-        return self.view as! ModularScrollView
+    var scrollView: UXModularScrollView<UIView> {
+        return self.view as! UXModularScrollView
     }
 
     let headerView = UIView()
@@ -45,13 +45,14 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         self.scrollView.appendModule(label2)
         self.scrollView.insertModule(label3, at: 1)
 
-        self.scrollView.padding = UIEdgeInsets(top: 110, left: 10, bottom: 10, right: 10)
+        self.scrollView.directionalModuleInsets = NSDirectionalEdgeInsets(top: 110, leading: 10, bottom: 10, trailing: 10)
         self.scrollView.moduleLayoutGuide.widthAnchor.constraint(lessThanOrEqualToConstant: 500).isActive = true
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
             UIView.animate(withDuration: 0.3, animations: {
-                self.scrollView.removeModule(at: 1)
-                self.scrollView.insertModule(label3, at: 2)
+                self.scrollView.verticalModuleSpacing = 10
+//                self.scrollView.removeModule(at: 1)
+//                self.scrollView.insertModule(label3, at: 2)
                 self.scrollView.layoutIfNeeded()
             })
         })
@@ -103,5 +104,23 @@ class WrappedLabel: UIView {
     var text: String? {
         get { return self.label.text }
         set { self.label.text = newValue }
+    }
+}
+
+class DebugModularScrollView<Module: UIView>: UXModularScrollView<Module> {
+    public override var contentSize: CGSize {
+        didSet { self.contentSizeDidChange() }
+    }
+
+    private func contentSizeDidChange() {
+        for module in self.modules {
+            self.ensureIntegrity(of: module)
+        }
+
+        self.ensureIntegrity(of: self)
+    }
+
+    private func ensureIntegrity(of module: UIView) {
+        _ = module.hasAmbiguousLayout
     }
 }
