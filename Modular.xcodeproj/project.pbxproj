@@ -12,12 +12,7 @@
 		CB5DD65E215EB4D500B4AE91 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB5DD65C215EB4D500B4AE91 /* Main.storyboard */; };
 		CB5DD660215EB4D600B4AE91 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CB5DD65F215EB4D600B4AE91 /* Assets.xcassets */; };
 		CB5DD663215EB4D600B4AE91 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB5DD661215EB4D600B4AE91 /* LaunchScreen.storyboard */; };
-		CB5DD66B215EB50100B4AE91 /* BlackBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5DD66A215EB50100B4AE91 /* BlackBox.swift */; };
-		CB5DD66D215EBB5300B4AE91 /* FancyHeightFunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5DD66C215EBB5300B4AE91 /* FancyHeightFunction.swift */; };
 		CB5DD66F215EBD9D00B4AE91 /* ModularScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5DD66E215EBD9D00B4AE91 /* ModularScrollView.swift */; };
-		CB5DD671215FAFD200B4AE91 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5DD670215FAFD200B4AE91 /* File.swift */; };
-		CB5DD674215FB18400B4AE91 /* UXSocketViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5DD672215FB18300B4AE91 /* UXSocketViewController.swift */; };
-		CB5DD675215FB18400B4AE91 /* UXSocketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5DD673215FB18400B4AE91 /* UXSocketView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,12 +23,7 @@
 		CB5DD65F215EB4D600B4AE91 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CB5DD662215EB4D600B4AE91 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CB5DD664215EB4D600B4AE91 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CB5DD66A215EB50100B4AE91 /* BlackBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackBox.swift; sourceTree = "<group>"; };
-		CB5DD66C215EBB5300B4AE91 /* FancyHeightFunction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FancyHeightFunction.swift; sourceTree = "<group>"; };
 		CB5DD66E215EBD9D00B4AE91 /* ModularScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModularScrollView.swift; sourceTree = "<group>"; };
-		CB5DD670215FAFD200B4AE91 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
-		CB5DD672215FB18300B4AE91 /* UXSocketViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UXSocketViewController.swift; sourceTree = "<group>"; };
-		CB5DD673215FB18400B4AE91 /* UXSocketView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UXSocketView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,13 +58,8 @@
 			children = (
 				CB5DD658215EB4D500B4AE91 /* AppDelegate.swift */,
 				CB5DD65A215EB4D500B4AE91 /* ViewController.swift */,
-				CB5DD670215FAFD200B4AE91 /* File.swift */,
 				CB5DD66E215EBD9D00B4AE91 /* ModularScrollView.swift */,
-				CB5DD66A215EB50100B4AE91 /* BlackBox.swift */,
-				CB5DD66C215EBB5300B4AE91 /* FancyHeightFunction.swift */,
 				CB5DD65C215EB4D500B4AE91 /* Main.storyboard */,
-				CB5DD673215FB18400B4AE91 /* UXSocketView.swift */,
-				CB5DD672215FB18300B4AE91 /* UXSocketViewController.swift */,
 				CB5DD65F215EB4D600B4AE91 /* Assets.xcassets */,
 				CB5DD661215EB4D600B4AE91 /* LaunchScreen.storyboard */,
 				CB5DD664215EB4D600B4AE91 /* Info.plist */,
@@ -154,13 +139,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB5DD66F215EBD9D00B4AE91 /* ModularScrollView.swift in Sources */,
-				CB5DD671215FAFD200B4AE91 /* File.swift in Sources */,
-				CB5DD66D215EBB5300B4AE91 /* FancyHeightFunction.swift in Sources */,
 				CB5DD65B215EB4D500B4AE91 /* ViewController.swift in Sources */,
 				CB5DD659215EB4D500B4AE91 /* AppDelegate.swift in Sources */,
-				CB5DD674215FB18400B4AE91 /* UXSocketViewController.swift in Sources */,
-				CB5DD675215FB18400B4AE91 /* UXSocketView.swift in Sources */,
-				CB5DD66B215EB50100B4AE91 /* BlackBox.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

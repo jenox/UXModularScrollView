@@ -26,7 +26,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         self.scrollView.delegate = self
         self.view.backgroundColor = .white
 
-        self.headerView.backgroundColor = .red
+        self.headerView.backgroundColor = UIColor.purple.withAlphaComponent(0.2)
         self.scrollView.addSubview(self.headerView)
 
         let label1 = WrappedLabel()
@@ -47,6 +47,14 @@ class ViewController: UIViewController, UIScrollViewDelegate {
 
         self.scrollView.padding = UIEdgeInsets(top: 110, left: 10, bottom: 10, right: 10)
         self.scrollView.moduleLayoutGuide.widthAnchor.constraint(lessThanOrEqualToConstant: 500).isActive = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.scrollView.removeModule(at: 1)
+                self.scrollView.insertModule(label3, at: 2)
+                self.scrollView.layoutIfNeeded()
+            })
+        })
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

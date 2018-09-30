@@ -1,14 +1,27 @@
-//
-//  ModularScrollView.swift
-//  Modular
-//
-//  Created by Christian Schnorr on 28.09.18.
-//  Copyright © 2018 Christian Schnorr. All rights reserved.
-//
+/*
+ MIT License
+ Copyright (c) 2018 Christian Schnorr
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 
 import UIKit
 
-class ModularScrollView<Module: UIView>: UIScrollView {
+
+public class ModularScrollView<Module: UIView>: UIScrollView {
 
     // MARK: - Initialization
 
@@ -18,7 +31,7 @@ class ModularScrollView<Module: UIView>: UIScrollView {
         self.alwaysBounceVertical = true
 
         self.establishSubviewHiearchy()
-        self.configureLayoutConstraints()
+        self.createLayoutConstraints()
     }
 
     public required init?(coder: NSCoder) {
@@ -26,136 +39,181 @@ class ModularScrollView<Module: UIView>: UIScrollView {
     }
 
 
-    // MARK: - Module Management
 
-    // TODO: header, footer view
+    // MARK: - Configuration
 
-    fileprivate var paddingAtTopEdgeConstraint: NSLayoutConstraint! = nil
-    fileprivate var paddingAtLeadingEdgeConstraint: NSLayoutConstraint! = nil
-    fileprivate var paddingAtTrailingEdgeConstraint: NSLayoutConstraint! = nil
-    fileprivate var paddingAtBottomEdgeConstraint: NSLayoutConstraint! = nil
+    public let contentView: UIView = UIView()
 
-//    let top = self.paddingAtTopEdgeConstraint.constant
-//    let left = self.paddingAtLeadingEdgeConstraint.constant
-//    let right = self.paddingAtTrailingEdgeConstraint.constant
-//    let bottom = self.paddingAtBottomEdgeConstraint.constant
-//
-//    return UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
+    public let moduleLayoutGuide: UILayoutGuide = UILayoutGuide()
 
     public var padding: UIEdgeInsets = .zero {
-        didSet {
-            self.paddingAtTopEdgeConstraint.constant = fmax(self.padding.top, 0)
-            self.paddingAtLeadingEdgeConstraint.constant = fmax(self.padding.left, 0)
-            self.paddingAtTrailingEdgeConstraint.constant = fmax(self.padding.right, 0)
-            self.paddingAtBottomEdgeConstraint.constant = fmax(self.padding.bottom, 0)
-        }
+        didSet { self.updatePaddingConstraints() }
     }
 
-    public var maximumModuleWidth: CGFloat? = nil {
-        didSet {}
+    public var verticalModuleSpacing: CGFloat = 0 {
+        didSet { self.updateModuleSpacingConstraints() }
     }
 
-    private let moduleSpacing: CGFloat = 10
+
+    // MARK: - Module Management
 
     private(set) public var modules: [Module] = []
 
-    // -> vertical layout constraints
-    private var verticalSpacingConstraints: [NSLayoutConstraint] = []
-
-
+    private var verticalLayoutConstraints: [NSLayoutConstraint] = []
 
     public func insertModule(_ module: Module, at index: Int) {
         precondition(0 <= index && index <= self.modules.count)
         precondition(!self.modules.contains(module))
 
+        self.modules.insert(module, at: index)
         self.contentView.addSubview(module)
 
         module.translatesAutoresizingMaskIntoConstraints = false
         module.leadingAnchor.constraint(equalTo: self.moduleLayoutGuide.leadingAnchor).isActive = true
         module.trailingAnchor.constraint(equalTo: self.moduleLayoutGuide.trailingAnchor).isActive = true
 
-        // Kill constraint connecting modules at indices `index - 1` and `index`
-        self.verticalSpacingConstraints[index].isActive = false
-        self.verticalSpacingConstraints.remove(at: index)
-
-        let top: NSLayoutConstraint
-        let bottom: NSLayoutConstraint
-
-        if let previousModule = self.modules.prefix(index).last {
-            top = module.topAnchor.constraint(equalTo: previousModule.bottomAnchor, constant: self.moduleSpacing)
-        }
-        else {
-            top = module.topAnchor.constraint(equalTo: self.moduleLayoutGuide.topAnchor)
-        }
-
-        if let nextModule = self.modules.dropFirst(index).first {
-            bottom = nextModule.topAnchor.constraint(equalTo: module.bottomAnchor, constant: self.moduleSpacing)
-        }
-        else {
-            bottom = self.moduleLayoutGuide.bottomAnchor.constraint(equalTo: module.bottomAnchor)
-        }
-
-        NSLayoutConstraint.activate([
-            top, bottom
-        ])
-
-        self.verticalSpacingConstraints.insert(top, at: index)
-        self.verticalSpacingConstraints.insert(bottom, at: index + 1)
-
-        self.modules.append(module)
+        self.removeVerticalLayoutConstraint(at: index)
+        self.createVerticalLayoutConstraint(at: index)
+        self.createVerticalLayoutConstraint(at: index + 1)
     }
 
-//    public func removeModule(at index: Int) {
-//    }
-//
-//    public func insertModule(_ module: Module, above other: Module) {
-//    }
-//
-//    public func insertModule(_ module: Module, below other: Module) {
-//    }
+    public func insertModule(_ module: Module, above other: Module) {
+        let index = self.modules.firstIndex(of: other) ?? 0
+
+        self.insertModule(module, at: index)
+    }
+
+    public func insertModule(_ module: Module, below other: Module) {
+        let index = self.modules.firstIndex(of: other) ?? self.modules.count
+
+        self.insertModule(module, at: index)
+    }
 
     public func appendModule(_ module: Module) {
         self.insertModule(module, at: self.modules.count)
     }
 
-//    public func removeAllModules() {
-//    }
+    public func removeModule(at index: Int) {
+        let module = self.modules.remove(at: index)
+        module.removeFromSuperview()
+
+        self.removeVerticalLayoutConstraint(at: index + 1)
+        self.removeVerticalLayoutConstraint(at: index)
+        self.createVerticalLayoutConstraint(at: index)
+    }
+
+    public func removeAllModules() {
+        let modules = self.modules
+
+        self.modules = []
+        self.removeAllVerticalLayoutConstraints()
+
+        for module in modules {
+            module.removeFromSuperview()
+        }
+    }
+
+    fileprivate func createVerticalLayoutConstraint(at index: Int) {
+        let upperModule = self.modules.prefix(index).last
+        let lowerModule = self.modules.dropFirst(index).first
+        let constraint: NSLayoutConstraint
+
+        switch (upperModule, lowerModule) {
+        case (.some(let upperModule), .some(let lowerModule)):
+            constraint = lowerModule.topAnchor.constraint(equalTo: upperModule.bottomAnchor, constant: self.verticalModuleSpacing)
+        case (.some(let upperModule), .none):
+            constraint = self.moduleLayoutGuide.bottomAnchor.constraint(equalTo: upperModule.bottomAnchor)
+        case (.none, .some(let lowerModule)):
+            constraint = lowerModule.topAnchor.constraint(equalTo: self.moduleLayoutGuide.topAnchor)
+        case (.none, .none):
+            constraint = self.contentView.bottomAnchor.constraint(equalTo: self.contentView.topAnchor)
+        }
+
+        constraint.isActive = true
+
+        self.verticalLayoutConstraints.insert(constraint, at: index)
+    }
+
+    fileprivate func removeVerticalLayoutConstraint(at index: Int) {
+        let constraint = self.verticalLayoutConstraints.remove(at: index)
+        constraint.isActive = false
+    }
+
+    fileprivate func removeAllVerticalLayoutConstraints() {
+        NSLayoutConstraint.deactivate(self.verticalLayoutConstraints)
+
+        self.verticalLayoutConstraints = []
+    }
+
+    fileprivate func updateModuleSpacingConstraints() {
+        for constraint in self.verticalLayoutConstraints.dropFirst().dropLast() {
+            constraint.constant = self.verticalModuleSpacing
+        }
+    }
 
 
+    // MARK: - Sizing & Layout
 
-    // MARK: - Subview Management
-
-    public let contentView: UIView = UIView()
-    public let moduleLayoutGuide: UILayoutGuide = UILayoutGuide()
+    private var paddingAtTopEdgeConstraint: NSLayoutConstraint! = nil
+    private var paddingAtLeadingEdgeConstraint: NSLayoutConstraint! = nil
+    private var paddingAtTrailingEdgeConstraint: NSLayoutConstraint! = nil
+    private var paddingAtBottomEdgeConstraint: NSLayoutConstraint! = nil
 
     fileprivate func establishSubviewHiearchy() {
         self.addSubview(self.contentView)
         self.addLayoutGuide(self.moduleLayoutGuide)
     }
 
-    fileprivate func configureLayoutConstraints() {
+    fileprivate func createLayoutConstraints() {
+        self.createContentViewConstraints()
+        self.createModuleLayoutGuideConstraints()
+
+        self.createVerticalLayoutConstraint(at: 0)
+    }
+
+    private func createContentViewConstraints() {
         self.contentView.translatesAutoresizingMaskIntoConstraints = false
-        self.contentView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-        self.contentView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        self.contentView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-        self.contentView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-        self.contentView.widthAnchor.constraint(equalTo: self.widthAnchor).isActive = true
-        self.contentView.backgroundColor = UIColor.yellow
 
         NSLayoutConstraint.activate([
-            self.moduleLayoutGuide.topAnchor.constraint(equalTo: self.contentView.topAnchor).save(to: &self.paddingAtTopEdgeConstraint),
-            self.moduleLayoutGuide.leadingAnchor.constraint(greaterThanOrEqualTo: self.contentView.leadingAnchor).save(to: &self.paddingAtLeadingEdgeConstraint),
-            self.contentView.trailingAnchor.constraint(greaterThanOrEqualTo: self.moduleLayoutGuide.trailingAnchor).save(to: &self.paddingAtTrailingEdgeConstraint),
-            self.contentView.bottomAnchor.constraint(equalTo: self.moduleLayoutGuide.bottomAnchor).save(to: &self.paddingAtBottomEdgeConstraint),
-            self.moduleLayoutGuide.widthAnchor.constraint(equalTo: self.contentView.widthAnchor).priority(.defaultHigh),
-            self.moduleLayoutGuide.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor).priority(.defaultHigh),
+            self.contentView.topAnchor.constraint(equalTo: self.topAnchor),
+            self.contentView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            self.contentView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            self.contentView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            self.contentView.widthAnchor.constraint(equalTo: self.widthAnchor),
         ])
-
-        let constraint = self.contentView.topAnchor.constraint(equalTo: self.contentView.bottomAnchor)
-        constraint.isActive = true
-
-        self.verticalSpacingConstraints = [constraint]
     }
+
+    private func createModuleLayoutGuideConstraints() {
+        self.paddingAtTopEdgeConstraint = self.moduleLayoutGuide.topAnchor.constraint(equalTo: self.contentView.topAnchor)
+        self.paddingAtLeadingEdgeConstraint = self.moduleLayoutGuide.leadingAnchor.constraint(greaterThanOrEqualTo: self.contentView.leadingAnchor)
+        self.paddingAtTrailingEdgeConstraint = self.contentView.trailingAnchor.constraint(greaterThanOrEqualTo: self.moduleLayoutGuide.trailingAnchor)
+        self.paddingAtBottomEdgeConstraint = self.contentView.bottomAnchor.constraint(equalTo: self.moduleLayoutGuide.bottomAnchor)
+
+        let moduleWidthConstraint = self.moduleLayoutGuide.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor)
+        moduleWidthConstraint.priority = .defaultHigh
+
+        let moduleCenterConstraint = self.moduleLayoutGuide.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor)
+        moduleCenterConstraint.priority = .defaultHigh
+
+        NSLayoutConstraint.activate([
+            self.paddingAtTopEdgeConstraint,
+            self.paddingAtLeadingEdgeConstraint,
+            self.paddingAtTrailingEdgeConstraint,
+            self.paddingAtBottomEdgeConstraint,
+            moduleWidthConstraint,
+            moduleCenterConstraint,
+        ])
+    }
+
+    fileprivate func updatePaddingConstraints() {
+        self.paddingAtTopEdgeConstraint.constant = fmax(self.padding.top, 0)
+        self.paddingAtLeadingEdgeConstraint.constant = fmax(self.padding.left, 0)
+        self.paddingAtTrailingEdgeConstraint.constant = fmax(self.padding.right, 0)
+        self.paddingAtBottomEdgeConstraint.constant = fmax(self.padding.bottom, 0)
+    }
+
+
+    // MARK: - Debug
 
     public override func layoutSubviews() {
         super.layoutSubviews()
@@ -167,34 +225,7 @@ class ModularScrollView<Module: UIView>: UIScrollView {
         self.ensureIntegrity(of: self)
     }
 
-    // observe subviews, so that if one is removed, we update constraints? (they get deactivated anyway but we'd keep reference)
-    public override func willRemoveSubview(_ subview: UIView) {
-        super.willRemoveSubview(subview)
-
-//        if let module = subview as? Module, let index = self.modules.firstIndex(of: module) {
-//            self.removeModule(at: index)
-//        }
-    }
-
-
     fileprivate func ensureIntegrity(of module: UIView) {
-        if module.hasAmbiguousLayout {
-            print("MODULE \(module) HAS AMBIGUOUS LAYOUT")
-        }
-    }
-}
-
-extension NSLayoutConstraint {
-
-    @discardableResult
-    func priority(_ priority: UILayoutPriority) -> NSLayoutConstraint {
-        self.priority = priority
-        return self
-    }
-
-    @discardableResult
-    func save(to constraint: inout NSLayoutConstraint!) -> NSLayoutConstraint {
-        constraint = self
-        return self
+        _ = module.hasAmbiguousLayout
     }
 }

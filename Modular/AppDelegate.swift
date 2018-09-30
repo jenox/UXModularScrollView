@@ -15,19 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
         let vc = ViewController()
-        let wrapper = UXSocketViewController(contentViewController: vc)
 
-//        // works only for text, not for readableContentGuide (only blocks updates for readable, but initial is user pref)
-//        let traits = UITraitCollection(preferredContentSizeCategory: .extraSmall)
-//        wrapper.setOverrideTraitCollection(traits, forChild: vc)
-
-        self.window!.rootViewController = wrapper
-
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-//
-//        })
+        self.window!.rootViewController = vc
 
         return true
     }
