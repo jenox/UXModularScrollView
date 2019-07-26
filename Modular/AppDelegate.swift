@@ -15,10 +15,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        self.window = UIWindow()
+
         let vc = ViewController()
 
         self.window!.rootViewController = vc
 
+        self.window?.makeKeyAndVisible()
+
         return true
     }
 }
+
+//class StackView: UIStackView {
+//    override func willRemoveSubview(_ subview: UIView) {
+//        print("not calling super")
+//    }
+//}

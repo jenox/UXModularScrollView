@@ -24,6 +24,12 @@
 import UIKit
 
 
+/**
+ * The `UXModularScrollView` class is a vertical scroll that manages a dynamic
+ * list so-called modules that are laid out as a vertical stack.
+ *
+ * - Author: christian.schnorr@me.com
+ */
 public class UXModularScrollView<Module: UIView>: UIScrollView {
 
     // MARK: - Initialization
@@ -31,10 +37,19 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
     public override init(frame: CGRect) {
         super.init(frame: frame)
 
+        self.contentView.layoutMargins = .zero
         self.alwaysBounceVertical = true
 
         self.establishSubviewHiearchy()
         self.createLayoutConstraints()
+    }
+
+    public convenience init(modules: [Module]) {
+        self.init(frame: .null)
+
+        for module in modules {
+            self.appendModule(module)
+        }
     }
 
     public required init?(coder: NSCoder) {
@@ -43,8 +58,6 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
 
 
     // MARK: - Configuration
-
-    public let contentView: UIView = UIView()
 
     public let moduleLayoutGuide: UILayoutGuide = UILayoutGuide()
 
@@ -75,7 +88,7 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
         precondition(!self.modules.contains(module))
 
         self.modules.insert(module, at: index)
-        self.contentView.addSubview(module)
+        self.addSubview(module)
 
         module.translatesAutoresizingMaskIntoConstraints = false
         module.leadingAnchor.constraint(equalTo: self.moduleLayoutGuide.leadingAnchor).isActive = true
@@ -161,16 +174,17 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
     }
 
 
-    // MARK: - Sizing & Layout
+    // MARK: - Subview Management
+
+    fileprivate let contentView: UIView = UIView()
 
     fileprivate func establishSubviewHiearchy() {
         self.addSubview(self.contentView)
-        self.addLayoutGuide(self.moduleLayoutGuide)
-
-        self.contentView.layoutMargins = .zero
     }
 
     fileprivate func createLayoutConstraints() {
+        self.addLayoutGuide(self.moduleLayoutGuide)
+
         self.createContentViewConstraints()
         self.createModuleLayoutGuideConstraints()
 
@@ -204,5 +218,13 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
             moduleWidthConstraint,
             moduleCenterConstraint,
         ])
+    }
+
+    public override func willRemoveSubview(_ subview: UIView) {
+        super.willRemoveSubview(subview)
+
+        if let index = self.modules.firstIndex(where: { $0 === subview }) {
+            self.removeModule(at: index)
+        }
     }
 }
