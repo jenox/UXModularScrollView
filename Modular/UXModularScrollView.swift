@@ -25,14 +25,14 @@ import UIKit
 
 
 /**
- * The `UXModularScrollView` class is a vertical scroll that manages a dynamic
- * list so-called modules that are laid out as a vertical stack.
+ * The `UXModularScrollView` class is a vertical scroll view that manages a
+ * dynamic list of so-called modules that are laid out as a vertical stack.
  *
  * - Author: christian.schnorr@me.com
  */
 public class UXModularScrollView<Module: UIView>: UIScrollView {
 
-    // MARK: - Initialization
+    // MARK: - Lifecycle
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -56,6 +56,12 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
         fatalError()
     }
 
+    deinit {
+        self.isBeingDeallocated = true
+    }
+
+    fileprivate var isBeingDeallocated: Bool = false
+
 
     // MARK: - Configuration
 
@@ -66,7 +72,6 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
         set { self.contentView.layoutMargins = newValue }
     }
 
-    @available(iOS 11.0, *)
     public var directionalModuleInsets: NSDirectionalEdgeInsets {
         get { return self.contentView.directionalLayoutMargins }
         set { self.contentView.directionalLayoutMargins = newValue }
@@ -129,6 +134,7 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
 
         self.modules = []
         self.removeAllVerticalLayoutConstraints()
+        self.createVerticalLayoutConstraint(at: 0)
 
         for module in modules {
             module.removeFromSuperview()
@@ -148,7 +154,7 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
         case (.none, .some(let lowerModule)):
             constraint = lowerModule.topAnchor.constraint(equalTo: self.moduleLayoutGuide.topAnchor)
         case (.none, .none):
-            constraint = self.contentView.bottomAnchor.constraint(equalTo: self.contentView.topAnchor)
+            constraint = self.moduleLayoutGuide.bottomAnchor.constraint(equalTo: self.moduleLayoutGuide.topAnchor)
         }
 
         constraint.isActive = true
@@ -205,10 +211,13 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
 
     private func createModuleLayoutGuideConstraints() {
         let moduleWidthConstraint = self.moduleLayoutGuide.widthAnchor.constraint(equalTo: self.contentView.widthAnchor)
-        moduleWidthConstraint.priority = .defaultHigh
+        moduleWidthConstraint.priority = UILayoutPriority(rawValue: 800)
 
         let moduleCenterConstraint = self.moduleLayoutGuide.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor)
-        moduleCenterConstraint.priority = .defaultHigh
+        moduleCenterConstraint.priority = UILayoutPriority(rawValue: 800)
+
+        let scrollViewHeightConstraint = self.heightAnchor.constraint(equalTo: self.contentView.heightAnchor)
+        scrollViewHeightConstraint.priority = UILayoutPriority(rawValue: 100)
 
         NSLayoutConstraint.activate([
             self.moduleLayoutGuide.topAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.topAnchor),
@@ -217,11 +226,14 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
             self.contentView.layoutMarginsGuide.bottomAnchor.constraint(equalTo: self.moduleLayoutGuide.bottomAnchor),
             moduleWidthConstraint,
             moduleCenterConstraint,
+            scrollViewHeightConstraint,
         ])
     }
 
     public override func willRemoveSubview(_ subview: UIView) {
         super.willRemoveSubview(subview)
+
+        guard !self.isBeingDeallocated else { return }
 
         if let index = self.modules.firstIndex(where: { $0 === subview }) {
             self.removeModule(at: index)
