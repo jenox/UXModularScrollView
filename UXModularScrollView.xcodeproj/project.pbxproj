@@ -15,7 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		CB5DD655215EB4D500B4AE91 /* Modular.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Modular.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CB5DD655215EB4D500B4AE91 /* UXModularScrollView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UXModularScrollView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB5DD658215EB4D500B4AE91 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CB5DD65A215EB4D500B4AE91 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CB5DD65F215EB4D600B4AE91 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -38,7 +38,7 @@
 		CB5DD64C215EB4D500B4AE91 = {
 			isa = PBXGroup;
 			children = (
-				CB5DD657215EB4D500B4AE91 /* Modular */,
+				CB5DD657215EB4D500B4AE91 /* UXModularScrollView */,
 				CB5DD656215EB4D500B4AE91 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -46,12 +46,12 @@
 		CB5DD656215EB4D500B4AE91 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CB5DD655215EB4D500B4AE91 /* Modular.app */,
+				CB5DD655215EB4D500B4AE91 /* UXModularScrollView.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		CB5DD657215EB4D500B4AE91 /* Modular */ = {
+		CB5DD657215EB4D500B4AE91 /* UXModularScrollView */ = {
 			isa = PBXGroup;
 			children = (
 				CB5DD658215EB4D500B4AE91 /* AppDelegate.swift */,
@@ -61,15 +61,15 @@
 				CB5DD661215EB4D600B4AE91 /* LaunchScreen.storyboard */,
 				CB5DD664215EB4D600B4AE91 /* Info.plist */,
 			);
-			path = Modular;
+			path = UXModularScrollView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		CB5DD654215EB4D500B4AE91 /* Modular */ = {
+		CB5DD654215EB4D500B4AE91 /* UXModularScrollView */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CB5DD667215EB4D600B4AE91 /* Build configuration list for PBXNativeTarget "Modular" */;
+			buildConfigurationList = CB5DD667215EB4D600B4AE91 /* Build configuration list for PBXNativeTarget "UXModularScrollView" */;
 			buildPhases = (
 				CB5DD651215EB4D500B4AE91 /* Sources */,
 				CB5DD652215EB4D500B4AE91 /* Frameworks */,
@@ -79,9 +79,9 @@
 			);
 			dependencies = (
 			);
-			name = Modular;
+			name = UXModularScrollView;
 			productName = Modular;
-			productReference = CB5DD655215EB4D500B4AE91 /* Modular.app */;
+			productReference = CB5DD655215EB4D500B4AE91 /* UXModularScrollView.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -99,7 +99,7 @@
 					};
 				};
 			};
-			buildConfigurationList = CB5DD650215EB4D500B4AE91 /* Build configuration list for PBXProject "Modular" */;
+			buildConfigurationList = CB5DD650215EB4D500B4AE91 /* Build configuration list for PBXProject "UXModularScrollView" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -112,7 +112,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				CB5DD654215EB4D500B4AE91 /* Modular */,
+				CB5DD654215EB4D500B4AE91 /* UXModularScrollView */,
 			);
 		};
 /* End PBXProject section */
@@ -275,13 +275,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = Modular/Info.plist;
+				INFOPLIST_FILE = UXModularScrollView/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.jenox.Modular;
+				PRODUCT_BUNDLE_IDENTIFIER = net.jenox.UXModularScrollView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -293,13 +293,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = Modular/Info.plist;
+				INFOPLIST_FILE = UXModularScrollView/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.jenox.Modular;
+				PRODUCT_BUNDLE_IDENTIFIER = net.jenox.UXModularScrollView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -309,7 +309,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		CB5DD650215EB4D500B4AE91 /* Build configuration list for PBXProject "Modular" */ = {
+		CB5DD650215EB4D500B4AE91 /* Build configuration list for PBXProject "UXModularScrollView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CB5DD665215EB4D600B4AE91 /* Debug */,
@@ -318,7 +318,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CB5DD667215EB4D600B4AE91 /* Build configuration list for PBXNativeTarget "Modular" */ = {
+		CB5DD667215EB4D600B4AE91 /* Build configuration list for PBXNativeTarget "UXModularScrollView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CB5DD668215EB4D600B4AE91 /* Debug */,

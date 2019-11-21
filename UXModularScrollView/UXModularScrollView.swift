@@ -72,6 +72,7 @@ public class UXModularScrollView<Module: UIView>: UIScrollView {
         set { self.contentView.layoutMargins = newValue }
     }
 
+    @available(iOS 11.0, *)
     public var directionalModuleInsets: NSDirectionalEdgeInsets {
         get { return self.contentView.directionalLayoutMargins }
         set { self.contentView.directionalLayoutMargins = newValue }
