@@ -26,9 +26,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 }
-
-//class StackView: UIStackView {
-//    override func willRemoveSubview(_ subview: UIView) {
-//        print("not calling super")
-//    }
-//}

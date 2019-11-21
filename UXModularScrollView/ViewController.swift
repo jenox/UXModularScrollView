@@ -27,7 +27,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         self.view.backgroundColor = .white
 
         self.headerView.backgroundColor = UIColor.purple.withAlphaComponent(0.2)
-//        self.scrollView.addSubview(self.headerView)
+        self.scrollView.addSubview(self.headerView)
 
         let label1 = WrappedLabel()
         label1.backgroundColor = UIColor.red.withAlphaComponent(0.2)
@@ -45,27 +45,18 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         self.scrollView.appendModule(label2)
         self.scrollView.insertModule(label3, at: 1)
 
-//        self.scrollView.layoutMargins.left = 100
-//        self.scrollView.moduleInsets = UIEdgeInsets(top: 110, left: 0, bottom: 10, right: 10)
         self.scrollView.moduleLayoutGuide.widthAnchor.constraint(lessThanOrEqualToConstant: 500).isActive = true
+        self.scrollView.moduleInsets.top = 100
 
         label2.preservesSuperviewLayoutMargins = true
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-            label3.removeFromSuperview()
-//            UIView.animate(withDuration: 0.3, animations: {
-//                self.scrollView.verticalModuleSpacing = 10
-////                self.scrollView.removeModule(at: 1)
-////                self.scrollView.insertModule(label3, at: 2)
-//                self.scrollView.layoutIfNeeded()
-//            })
+            UIView.animate(withDuration: 0.3, animations: {
+                self.scrollView.verticalModuleSpacing = 10
+                self.scrollView.removeModule(at: 1)
+                self.scrollView.layoutIfNeeded()
+            })
         })
-
-//        self.scrollView.contentInset.left = 100
-
-//        if #available(iOS 11.0, *) {
-//            label3.label.leftAnchor.constraint(equalTo: self.scrollView.frameLayoutGuide.leftAnchor).isActive = true
-//        }
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -80,16 +71,13 @@ class ViewController: UIViewController, UIScrollViewDelegate {
 class WrappedLabel: UIView {
 
     let label = UILabel()
-    let marker = UIView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
         self.addSubview(self.label)
-//        self.addSubview(self.marker)
 
         self.label.font = UIFont.systemFont(ofSize: 25.0, weight: .regular)
-//        self.label.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: UIFont.systemFont(ofSize: 20, weight: .regular))
         self.label.numberOfLines = 0
 
         if #available(iOS 10.0, *) {
@@ -101,15 +89,6 @@ class WrappedLabel: UIView {
         self.label.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor).isActive = true
         self.label.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor).isActive = true
         self.label.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-
-//        self.marker.translatesAutoresizingMaskIntoConstraints = false
-//        self.marker.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor).isActive = true
-//        self.marker.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor).isActive = true
-//        self.marker.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor).isActive = true
-//        self.marker.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor).isActive = true
-//        self.marker.layer.cornerRadius = 2
-//        self.marker.layer.borderWidth = 0.5
-//        self.marker.layer.borderColor = UIColor.red.cgColor
     }
 
     required init?(coder: NSCoder) {
